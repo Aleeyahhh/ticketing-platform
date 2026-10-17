@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#111018" />
+  <title>TicketRush — Your next experience starts here</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    :root {
+      --bg: #111018; --panel: #1b1924; --panel2: #23202d; --text: #fbf8ff;
+      --muted: #aaa5b8; --pink: #ff3d81; --orange: #ff8a3d; --lime: #d6ff62;
+      --purple: #8d67ff; --line: rgba(255,255,255,.11); --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: "DM Sans", sans-serif; }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin: auto; }
+    .topbar { border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; background: rgba(17,16,24,.88); backdrop-filter: blur(18px); }
+    .nav { height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 10px; font: 700 23px "Space Grotesk", sans-serif; letter-spacing: -1px; }
+    .brand-mark { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(135deg,var(--pink),var(--orange)); display: grid; place-items: center; color: #17121b; font-size: 20px; transform: rotate(-7deg); }
+    .nav-links { display: flex; gap: 28px; color: var(--muted); font-size: 14px; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .btn { border: 0; border-radius: 999px; padding: 12px 19px; font-weight: 700; cursor: pointer; transition: transform .2s, filter .2s; }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .btn-primary { background: var(--lime); color: #191a10; }
+    .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--text); }
+    .menu-btn { display: none; background: transparent; border: 1px solid var(--line); color: white; border-radius: 12px; padding: 9px 12px; cursor: pointer; }
+    .hero { padding: 66px 0 44px; overflow: hidden; }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 40px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid rgba(214,255,98,.3); color: var(--lime); border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .eyebrow span { width: 7px; height: 7px; background: var(--lime); border-radius: 50%; box-shadow: 0 0 12px var(--lime); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font: 700 clamp(46px, 6vw, 76px)/.99 "Space Grotesk", sans-serif; letter-spacing: -4px; margin: 22px 0 22px; max-width: 650px; }
+    h1 .accent { color: var(--pink); }
+    .hero-copy { color: var(--muted); line-height: 1.7; font-size: 16px; max-width: 470px; margin-bottom: 28px; }
+    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-art { min-height: 400px; position: relative; display: grid; place-items: center; }
+    .art-glow { position: absolute; width: 310px; height: 310px; background: var(--purple); filter: blur(100px); opacity: .32; border-radius: 50%; }
+    .poster { position: absolute; overflow: hidden; border-radius: 24px; box-shadow: 0 25px 60px rgba(0,0,0,.35); }
+    .poster-main { width: 255px; height: 330px; right: 16%; top: 28px; transform: rotate(7deg); background: linear-gradient(155deg,#ffb24c 0%,#ff3d81 42%,#642cff 100%); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; }
+    .poster-main:before { content: ""; position: absolute; width: 220px; height: 220px; border: 28px solid rgba(255,255,255,.22); border-radius: 50%; right: -72px; top: 68px; }
+    .poster-main:after { content: "✳"; position: absolute; font-size: 180px; color: rgba(255,255,255,.2); bottom: 24px; left: 18px; transform: rotate(-15deg); }
+    .poster-top, .poster-bottom { position: relative; z-index: 1; }
+    .poster-label { font-size: 10px; letter-spacing: .18em; font-weight: 700; }
+    .poster-title { font: 700 42px/.88 "Space Grotesk", sans-serif; letter-spacing: -2px; margin: 10px 0; }
+    .poster-date { font-size: 12px; font-weight: 700; }
+    .poster-side { width: 185px; height: 240px; left: 2%; bottom: 20px; transform: rotate(-9deg); background: linear-gradient(145deg,#c9ff6b,#1eaf9e 72%,#16556b); padding: 18px; color: #112525; }
+    .poster-side .poster-title { font-size: 32px; }
+    .poster-side:after { content: "♫"; position: absolute; font-size: 135px; bottom: -16px; right: 4px; color: rgba(17,37,37,.17); }
+    .floating-ticket { position: absolute; right: 0; bottom: 42px; z-index: 3; background: var(--panel); border: 1px solid var(--line); border-radius: 15px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; box-shadow: 0 16px 40px #0005; }
+    .ticket-icon { width: 39px; height: 39px; border-radius: 12px; display: grid; place-items: center; background: var(--lime); color: #111; font-size: 19px; }
+    .floating-ticket strong { display: block; font-size: 13px; }
+    .floating-ticket small { color: var(--muted); font-size: 11px; }
+    .search-shell { background: #fff; color: #201d28; border-radius: 20px; padding: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; box-shadow: 0 18px 60px #0003; }
+    .search-field { padding: 9px 14px; border-right: 1px solid #e9e6ed; min-width: 0; }
+    .search-field label { display: block; font-size: 11px; font-weight: 700; color: #8c8797; margin-bottom: 5px; }
+    .search-field select, .search-field input { border: 0; outline: 0; width: 100%; background: transparent; color: #211d2b; font-size: 14px; font-weight: 700; min-width: 0; }
+    .search-field select { cursor: pointer; }
+    .search-btn { align-self: stretch; border-radius: 13px; padding: 0 23px; background: var(--pink); color: white; border: 0; font-weight: 700; cursor: pointer; }
+    .section { padding: 54px 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 24px; }
+    .kicker { color: var(--pink); text-transform: uppercase; letter-spacing: .15em; font-size: 11px; font-weight: 700; margin-bottom: 9px; }
+    h2 { font: 700 clamp(28px,3.3vw,39px)/1.1 "Space Grotesk", sans-serif; letter-spacing: -1.6px; margin-bottom: 0; }
+    .subtext { color: var(--muted); font-size: 14px; margin: 10px 0 0; }
+    .text-link { color: var(--lime); font-weight: 700; font-size: 13px; white-space: nowrap; }
+    .category-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 13px; }
+    .category { border: 1px solid var(--line); background: var(--panel); border-radius: 18px; padding: 19px 16px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; color: var(--text); transition: .2s; }
+    .category:hover, .category.selected { border-color: var(--pink); background: #2a1c2b; transform: translateY(-3px); }
+    .cat-icon { width: 42px; height: 42px; flex-shrink: 0; display: grid; place-items: center; border-radius: 13px; font-size: 20px; }
+    .category strong { display: block; font-size: 13px; }
+    .category small { color: var(--muted); font-size: 11px; display: block; margin-top: 4px; }
+    .event-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 19px; }
+    .event-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: transform .2s,border-color .2s; }
+    .event-card:hover { transform: translateY(-5px); border-color: #655a7a; }
+    .event-image { height: 205px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; isolation: isolate; }
+    .event-image:before, .event-image:after { content: ""; position: absolute; border-radius: 50%; z-index: -1; }
+    .event-image:before { width: 210px; height: 210px; border: 34px solid rgba(255,255,255,.15); right: -35px; top: -68px; }
+    .event-image:after { width: 150px; height: 150px; background: rgba(255,255,255,.12); left: -25px; bottom: -85px; }
+    .visual-word { font: 700 34px/.9 "Space Grotesk", sans-serif; letter-spacing: -1.7px; text-align: center; text-transform: uppercase; transform: rotate(-5deg); text-shadow: 0 5px 25px #0002; }
+    .event-image .pill { position: absolute; top: 14px; left: 14px; background: rgba(17,16,24,.75); backdrop-filter: blur(8px); padding: 7px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+    .save-btn { position: absolute; top: 12px; right: 12px; width: 35px; height: 35px; border-radius: 50%; background: rgba(17,16,24,.72); border: 1px solid #ffffff33; color: white; font-size: 17px; cursor: pointer; }
+    .save-btn.saved { color: var(--pink); background: white; }
+    .event-content { padding: 18px; }
+    .event-date { color: var(--lime); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+    .event-content h3 { font: 700 20px "Space Grotesk", sans-serif; margin: 8px 0; letter-spacing: -.4px; }
+    .event-meta { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted); font-size: 12px; }
+    .event-footer { border-top: 1px solid var(--line); margin-top: 17px; padding-top: 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .price { font-weight: 700; font-size: 15px; }
+    .price small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; margin-top: 3px; }
+    .mini-btn { border: 1px solid var(--line); color: var(--text); background: transparent; padding: 9px 13px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .mini-btn:hover { border-color: var(--lime); color: var(--lime); }
+    .no-results { grid-column: 1/-1; padding: 50px 20px; text-align: center; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--muted); }
+    .promo { margin: 30px 0 70px; background: linear-gradient(110deg,#8d67ff 0%,#ff3d81 57%,#ff8a3d 100%); border-radius: 28px; padding: 42px; display: flex; align-items: center; justify-content: space-between; gap: 30px; position: relative; overflow: hidden; }
+    .promo:after { content: "✳"; position: absolute; font-size: 250px; line-height: 1; color: #ffffff19; right: 24%; top: -75px; transform: rotate(18deg); }
+    .promo-copy { max-width: 570px; position: relative; z-index: 1; }
+    .promo h2 { font-size: clamp(28px,4vw,43px); margin-bottom: 12px; }
+    .promo p { color: #fffde8; margin-bottom: 0; line-height: 1.6; font-size: 14px; }
+    .promo .btn { background: white; color: #21152d; position: relative; z-index: 1; white-space: nowrap; }
+    footer { border-top: 1px solid var(--line); padding: 30px 0; color: var(--muted); font-size: 12px; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .footer-links { display: flex; gap: 20px; }
+    .toast { position: fixed; z-index: 40; left: 50%; bottom: 24px; transform: translate(-50%,20px); background: var(--lime); color: #191a10; padding: 13px 18px; border-radius: 999px; font-weight: 700; font-size: 13px; box-shadow: 0 10px 40px #0005; opacity: 0; pointer-events: none; transition: .25s; }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+    .mobile-nav { display: none; }
+    @media (max-width: 900px) {
+      .nav-links { gap: 16px; }
+      .hero-grid { grid-template-columns: 1fr .85fr; gap: 12px; }
+      .poster-main { right: 10%; width: 220px; height: 295px; }
+      .poster-side { left: 0; width: 150px; height: 210px; }
+      .category-grid { grid-template-columns: repeat(3,1fr); }
+      .event-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 650px) {
+      .wrap { width: min(100% - 28px, 500px); }
+      .nav { height: 66px; }
+      .nav-links, .nav-actions .btn-ghost { display: none; }
+      .menu-btn { display: block; }
+      .mobile-nav { display: none; padding: 0 0 16px; }
+      .mobile-nav.open { display: grid; gap: 2px; }
+      .mobile-nav a { padding: 12px 4px; color: var(--muted); }
+      .hero { padding: 42px 0 25px; }
+      .hero-grid { grid-template-columns: 1fr; }
+      h1 { letter-spacing: -2.5px; font-size: clamp(46px,13vw,64px); }
+      .hero-copy { font-size: 14px; }
+      .hero-art { min-height: 310px; margin-top: 4px; }
+      .poster-main { width: 205px; height: 265px; right: 13%; top: 10px; }
+      .poster-title { font-size: 34px; }
+      .poster-side { width: 140px; height: 185px; bottom: 10px; }
+      .poster-side .poster-title { font-size: 27px; }
+      .floating-ticket { right: -2px; bottom: 18px; padding: 10px 12px; }
+      .search-shell { grid-template-columns: 1fr 1fr; gap: 0; padding: 8px; }
+      .search-field { padding: 10px; border-bottom: 1px solid #e9e6ed; }
+      .search-field:nth-child(2) { border-right: 0; }
+      .search-field:nth-child(3) { border-bottom: 0; }
+      .search-btn { margin: 6px; min-height: 48px; }
+      .section { padding: 38px 0; }
+      .section-head { align-items: start; }
+      .category-grid { grid-template-columns: repeat(2,1fr); gap: 9px; }
+      .category { padding: 13px 11px; gap: 9px; }
+      .cat-icon { width: 36px; height: 36px; font-size: 17px; }
+      .category strong { font-size: 12px; }
+      .event-grid { grid-template-columns: 1fr; }
+      .event-image { height: 220px; }
+      .promo { padding: 29px 24px; display: block; margin: 18px 0 46px; }
+      .promo .btn { margin-top: 23px; }
+      .promo:after { right: -20px; }
+      .footer-inner { align-items: start; flex-direction: column; }
+      .footer-links { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <a class="brand" href="#" aria-label="TicketRush home"><span class="brand-mark">↗</span>ticket<span style="color:var(--pink)">rush</span></a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a class="active" href="#discover">Discover</a>
+        <a href="#categories">Categories</a>
+        <a href="#trending">Trending</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn btn-ghost" id="savedNav">♡ Saved <span id="savedCount">0</span></button>
+        <button class="btn btn-primary" id="sellBtn">＋ Sell tickets</button>
+        <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+    <nav class="wrap mobile-nav" id="mobileNav" aria-label="Mobile navigation">
+      <a href="#discover">Discover</a><a href="#categories">Categories</a><a href="#trending">Trending</a><a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="discover">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow"><span></span> Your plans, upgraded</div>
+            <h1>Good times.<br />Great seats.<br /><span class="accent">Zero stress.</span></h1>
+            <p class="hero-copy">From front-row moments to your next getaway, find tickets for the things that make life feel bigger. One place. All the action.</p>
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="#trending">Explore tickets ↗</a>
+              <a class="btn btn-ghost" href="#categories">Browse categories</a>
+            </div>
+          </div>
+          <div class="hero-art" aria-label="Colorful ticket poster artwork">
+            <div class="art-glow"></div>
+            <div class="poster poster-side">
+              <div class="poster-top"><div class="poster-label">ESCAPE THE ORDINARY</div><div class="poster-title">TAKE<br />THE<br />SCENIC<br />ROUTE.</div></div>
+              <div class="poster-bottom"><div class="poster-date">YOUR NEXT TRIP STARTS HERE ↗</div></div>
+            </div>
+            <div class="poster poster-main">
+              <div class="poster-top"><div class="poster-label">ONE NIGHT. ALL THE FEELS.</div><div class="poster-title">MAKE<br />SOME<br />NOISE<span style="color:var(--lime)">.</span></div></div>
+              <div class="poster-bottom"><div class="poster-date">LIVE LOUD • 2026</div></div>
+            </div>
+            <div class="floating-ticket"><div class="ticket-icon">✦</div><div><strong>Your next memory</strong><small>is just a ticket away</small></div></div>
+          </div>
+        </div>
+
+        <form class="search-shell" id="searchForm">
+          <div class="search-field">
+            <label for="keyword">WHAT ARE YOU LOOKING FOR?</label>
+            <input id="keyword" type="search" placeholder="Artist, event, destination..." />
+          </div>
+          <div class="search-field">
+            <label for="categoryFilter">CATEGORY</label>
+            <select id="categoryFilter">
+              <option value="all">All tickets</option>
+              <option value="Music">Music & concerts</option>
+              <option value="Travel">Travel & transport</option>
+              <option value="Sports">Sports</option>
+              <option value="Arts">Arts & culture</option>
+              <option value="Cinema">Cinema</option>
+              <option value="Experiences">Experiences</option>
+            </select>
+          </div>
+          <div class="search-field">
+            <label for="locationFilter">LOCATION</label>
+            <select id="locationFilter">
+              <option value="all">Anywhere</option>
+              <option value="Lagos">Lagos</option>
+              <option value="Abuja">Abuja</option>
+              <option value="Ibadan">Ibadan</option>
+              <option value="Online">Online</option>
+              <option value="International">International</option>
+            </select>
+          </div>
+          <button class="search-btn" type="submit">Find tickets ↗</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="section" id="categories">
+      <div class="wrap">
+        <div class="section-head">
+          <div><div class="kicker">Pick your vibe</div><h2>What are we doing?</h2><p class="subtext">Whatever you're into, there's a ticket for that.</p></div>
+          <a href="#trending" class="text-link">See everything ↗</a>
+        </div>
+        <div class="category-grid">
+          <button class="category" data-category="Music"><span class="cat-icon" style="background:#ff3d8125">🎤</span><span><strong>Music & concerts</strong><small>Live it loud</small></span></button>
+          <button class="category" data-category="Travel"><span class="cat-icon" style="background:#d6ff6225">🚌</span><span><strong>Travel & transport</strong><small>On your way</small></span></button>
+          <button class="category" data-category="Sports"><span class="cat-icon" style="background:#ff8a3d25">🏟️</span><span><strong>Sports</strong><small>Feel the rush</small></span></button>
+          <button class="category" data-category="Arts"><span class="cat-icon" style="background:#8d67ff25">🎨</span><span><strong>Arts & culture</strong><small>Get inspired</small></span></button>
+          <button class="category" data-category="Cinema"><span class="cat-icon" style="background:#45d6d025">🎬</span><span><strong>Cinema</strong><small>Lights, camera</small></span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="trending" style="padding-top:20px">
+      <div class="wrap">
+        <div class="section-head">
+          <div><div class="kicker">The good stuff</div><h2>Trending near you <span style="color:var(--pink)">↗</span></h2><p class="subtext">The experiences everyone's talking about.</p></div>
+          <a href="#trending" class="text-link" id="clearFilters">Clear filters ×</a>
+        </div>
+        <div class="event-grid" id="eventGrid"></div>
+      </div>
+    </section>
+
+    <section class="wrap" id="about">
+      <div class="promo">
+        <div class="promo-copy"><div class="kicker" style="color:#fff;margin-bottom:12px">Got a crowd to gather?</div><h2>Make your event the one they don't miss.</h2><p>List your event, reach your people, and keep your ticket sales moving — all from one simple platform.</p></div>
+        <button class="btn" id="promoSell">Start selling tickets ↗</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <a class="brand" href="#"><span class="brand-mark">↗</span>ticket<span style="color:var(--pink)">rush</span></a>
+      <span>© 2026 TicketRush. Made for your next big moment.</span>
+      <div class="footer-links"><a href="#about">About</a><a href="#categories">Categories</a><a href="mailto:hello@ticketrush.example">Contact</a></div>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const tickets = [
+      {id:1,title:"Lagos After Dark",category:"Music",location:"Lagos",date:"NOV 07, 2026",venue:"Muri Okunola Park",price:12000,tag:"SELLING FAST",word:"AFTER<br>DARK",bg:"linear-gradient(135deg,#ff8a3d,#ff3d81 65%,#6c32c8)",icon:"🎧"},
+      {id:2,title:"The Mainland Derby",category:"Sports",location:"Lagos",date:"NOV 14, 2026",venue:"Onikan Stadium",price:5000,tag:"FAN FAVOURITE",word:"GAME<br>ON!",bg:"linear-gradient(135deg,#d6ff62,#18a98e)",icon:"⚽"},
+      {id:3,title:"Abuja Art Weekend",category:"Arts",location:"Abuja",date:"NOV 21, 2026",venue:"Thought Pyramid Art Centre",price:3500,tag:"NEW DROP",word:"ART<br>LOUD",bg:"linear-gradient(135deg,#8d67ff,#ff69a5)",icon:"🎨"},
+      {id:4,title:"Coastal Escape: Lagos → Accra",category:"Travel",location:"International",date:"DEPARTURES DAILY",venue:"Murtala Muhammed Airport",price:95000,tag:"TRAVEL DEAL",word:"GO<br>FARTHER",bg:"linear-gradient(135deg,#38d8d0,#1767a7)",icon:"✈️"},
+      {id:5,title:"Midnight at the Movies",category:"Cinema",location:"Ibadan",date:"OCT 30, 2026",venue:"Ventura Mall Cinemas",price:4500,tag:"DATE NIGHT",word:"BIG<br>SCREEN",bg:"linear-gradient(135deg,#ffca65,#f05a55)",icon:"🎬"},
+      {id:6,title:"Sunset Rooftop Sessions",category:"Music",location:"Lagos",date:"NOV 28, 2026",venue:"Victoria Island Rooftop",price:8500,tag:"LIMITED SPOTS",word:"GOLDEN<br>HOUR",bg:"linear-gradient(135deg,#ffb84d,#ed4e75 60%,#6d3bd1)",icon:"🌇"},
+      {id:7,title:"Lagos City Bus Pass",category:"Travel",location:"Lagos",date:"VALID ANY DAY",venue:"City-wide routes",price:1800,tag:"EASY RIDES",word:"MOVE<br>SMART",bg:"linear-gradient(135deg,#d6ff62,#6dbb61)",icon:"🚌"},
+      {id:8,title:"Laugh Out Loud Live",category:"Experiences",location:"Abuja",date:"DEC 05, 2026",venue:"Transcorp Hilton",price:10000,tag:"GOOD VIBES",word:"LOL<br>LIVE",bg:"linear-gradient(135deg,#ff8a3d,#f33c7b)",icon:"😂"},
+      {id:9,title:"Theatre Under the Stars",category:"Arts",location:"Online",date:"NOV 12, 2026",venue:"Live-streamed performance",price:2500,tag:"WATCH ANYWHERE",word:"STAGE<br>LIGHTS",bg:"linear-gradient(135deg,#7c5cff,#263c95)",icon:"🎭"}
+    ];
+    const state = { category: "all", location: "all", keyword: "", saved: new Set() };
+    const grid = document.getElementById("eventGrid");
+    const money = n => "₦" + n.toLocaleString("en-NG");
+    function renderTickets() {
+      const filtered = tickets.filter(t => {
+        const matchCategory = state.category === "all" || t.category === state.category;
+        const matchLocation = state.location === "all" || t.location === state.location;
+        const q = state.keyword.trim().toLowerCase();
+        const matchKeyword = !q || [t.title,t.category,t.location,t.venue,t.date].join(" ").toLowerCase().includes(q);
+        return matchCategory && matchLocation && matchKeyword;
+      });
+      document.querySelectorAll(".category").forEach(b => b.classList.toggle("selected", b.dataset.category === state.category));
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="no-results"><div style="font-size:30px;margin-bottom:10px">🔎</div><strong>No tickets found just yet.</strong><p style="margin:8px 0 0">Try another keyword or clear your filters.</p></div>';
+        return;
+      }
+      grid.innerHTML = filtered.slice(0,6).map(t => `
+        <article class="event-card">
+          <div class="event-image" style="background:${t.bg}">
+            <span class="pill">${t.tag}</span>
+            <button class="save-btn ${state.saved.has(t.id) ? "saved" : ""}" data-save="${t.id}" aria-label="${state.saved.has(t.id) ? "Remove from" : "Add to"} saved tickets">${state.saved.has(t.id) ? "♥" : "♡"}</button>
+            <div class="visual-word">${t.word}</div>
+          </div>
+          <div class="event-content">
+            <div class="event-date">${t.date}</div>
+            <h3>${t.title}</h3>
+            <div class="event-meta"><span>📍 ${t.venue}</span><span>${t.icon} ${t.category}</span></div>
+            <div class="event-footer"><div class="price">${money(t.price)}<small>Starting from</small></div><button class="mini-btn" data-book="${t.id}">Get tickets ↗</button></div>
+          </div>
+        </article>`).join("");
+    }
+    function toast(message) {
+      const el = document.getElementById("toast");
+      el.textContent = message; el.classList.add("show");
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+    }
+    function updateSaved() { document.getElementById("savedCount").textContent = state.saved.size; }
+    document.getElementById("searchForm").addEventListener("submit", e => {
+      e.preventDefault();
+      state.keyword = document.getElementById("keyword").value;
+      state.category = document.getElementById("categoryFilter").value;
+      state.location = document.getElementById("locationFilter").value;
+      renderTickets();
+      document.getElementById("trending").scrollIntoView({behavior:"smooth"});
+    });
+    document.querySelectorAll(".category").forEach(btn => btn.addEventListener("click", () => {
+      state.category = state.category === btn.dataset.category ? "all" : btn.dataset.category;
+      document.getElementById("categoryFilter").value = state.category;
+      renderTickets();
+      document.getElementById("trending").scrollIntoView({behavior:"smooth",block:"start"});
+    }));
+    document.getElementById("clearFilters").addEventListener("click", e => {
+      e.preventDefault(); state.category = "all"; state.location = "all"; state.keyword = "";
+      document.getElementById("keyword").value = "";
+      document.getElementById("categoryFilter").value = "all";
+      document.getElementById("locationFilter").value = "all";
+      renderTickets();
+    });
+    grid.addEventListener("click", e => {
+      const save = e.target.closest("[data-save]");
+      const book = e.target.closest("[data-book]");
+      if (save) {
+        const id = Number(save.dataset.save);
+        state.saved.has(id) ? state.saved.delete(id) : state.saved.add(id);
+        updateSaved(); renderTickets();
+        toast(state.saved.has(id) ? "Added to your saved tickets ♥" : "Removed from saved tickets");
+      }
+      if (book) {
+        const ticket = tickets.find(t => t.id === Number(book.dataset.book));
+        toast(`Nice choice! Checkout for “${ticket.title}” would start here.`);
+      }
+    });
+    document.getElementById("savedNav").addEventListener("click", () => {
+      state.keyword = ""; state.location = "all"; state.category = "all";
+      renderTickets();
+      const saved = tickets.filter(t => state.saved.has(t.id));
+      if (!saved.length) toast("No saved tickets yet — tap ♡ on anything you like.");
+      else {
+        grid.innerHTML = saved.map(t => `
+          <article class="event-card"><div class="event-image" style="background:${t.bg}"><span class="pill">SAVED FOR LATER</span><div class="visual-word">${t.word}</div></div>
+          <div class="event-content"><div class="event-date">${t.date}</div><h3>${t.title}</h3><div class="event-meta"><span>📍 ${t.venue}</span><span>${t.icon} ${t.category}</span></div><div class="event-footer"><div class="price">${money(t.price)}<small>Starting from</small></div><button class="mini-btn" data-book="${t.id}">Get tickets ↗</button></div></div></article>`).join("");
+        document.getElementById("trending").scrollIntoView({behavior:"smooth"});
+      }
+    });
+    function sellAction() { toast("Event organiser sign-up is a demo feature for now."); }
+    document.getElementById("sellBtn").addEventListener("click", sellAction);
+    document.getElementById("promoSell").addEventListener("click", sellAction);
+    document.getElementById("menuBtn").addEventListener("click", () => document.getElementById("mobileNav").classList.toggle("open"));
+    document.querySelectorAll("#mobileNav a").forEach(a => a.addEventListener("click", () => document.getElementById("mobileNav").classList.remove("open")));
+    renderTickets();
+  </script>
+</body>
+</html>
